@@ -2,9 +2,9 @@
 using TMDbLib.Objects.Search;
 using TMDbLib.Objects.TvShows;
 
-namespace asyncenumerableyield_api
+namespace asyncenumerableyield_console
 {
-    public class MovieCollectionService: IMovieCollectionService
+    public class MovieCollectionService
     {
         private readonly TMDbClient _client;
 
@@ -17,26 +17,23 @@ namespace asyncenumerableyield_api
         public async IAsyncEnumerable<SearchTv> GetTVShowsIAsyncEnumerable()
         {
             var selectedLang = "en";
-            var searchResults = new List<SearchTv>();
 
             var page = 1;
             do
             {
                 var shows = await _client.GetTvShowListAsync(TvShowListType.Popular, selectedLang, page);
-                searchResults.AddRange(shows.Results.Take(4));
-                page++;
+                await Task.Delay(1000);
 
+                var searchResults = shows.Results.Take(1);
                 foreach (var show in searchResults)
                 {
                     yield return show;
                 }
 
-            } while (searchResults.Count < 11);
+                page++;
 
-            Console.WriteLine();
+            } while (page <= 10);
         }
-
-
 
         public async Task<IEnumerable<SearchTv>> GetTVShowsIEnumerable()
         {
@@ -47,25 +44,23 @@ namespace asyncenumerableyield_api
             do
             {
                 var shows = await _client.GetTvShowListAsync(TvShowListType.Popular, selectedLang, page);
-                searchResults.AddRange(shows.Results.Take(4));
+                await Task.Delay(1000);
+                searchResults.AddRange(shows.Results.Take(1));
                 page++;
 
-            } while (searchResults.Count < 11);
+
+            } while (searchResults.Count < 10);
 
             return searchResults;
         }
 
         public IEnumerable<SearchTv> GetTVShows()
         {
-            var searchResults = new List<SearchTv>();
-
             for (int i = 0; i < 10; i++)
             {
-                Thread.Sleep(500);
-                searchResults.Add(new SearchTv());
+                Thread.Sleep(1000);
+                yield return new SearchTv() {  Name = "Movie Name : " + i};
             }
-
-            return searchResults;
         }
 
         private static string GetApiKey()
@@ -73,9 +68,5 @@ namespace asyncenumerableyield_api
             return "e4a9881a9a3e0972af357b42c39afb04";
 
         }
-    }
-    public interface IMovieCollectionService
-    {
-        IAsyncEnumerable<SearchTv> GetTVShows();
     }
 }
