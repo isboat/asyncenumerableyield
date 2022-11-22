@@ -1,33 +1,35 @@
 ﻿namespace asyncenumerableyield_console
 {
+    /* Async Stream
+     * IAsyncEnumerable with Yield
+     */
     public class Program
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello world");
-
-
+            /*
+             * Retrieve shows from the movie database - TMDb
+             * 
+             */
             var _movieCollectionService = new MovieCollectionService();
 
 
+            Console.WriteLine($" ----------    Using Task<IEnumerable<T>>");
+            foreach (var show in await _movieCollectionService.GetTVShowsIEnumerable())
+            {
+                Console.WriteLine($"{DateTime.Now.ToLongTimeString()} Show name: {show.Name}");
+            }
 
-            var col = _movieCollectionService.GetTVShows();
-            Console.WriteLine($"Synchronous: Total retrieved: {col.Count()}");
-            foreach (var show in col)
+
+            Console.WriteLine($" ----------    Using IEnumerable<T>");
+            foreach (var show in _movieCollectionService.GetTVShows())
             {
                 Console.WriteLine($"{DateTime.Now.ToLongTimeString()} Show name: {show.Name}");
             }
 
 
 
-            var col2 = await _movieCollectionService.GetTVShowsIEnumerable();
-            Console.WriteLine($"Async: Total retrieved: {col.Count()}");
-            foreach (var show in col2)
-            {
-                Console.WriteLine($"{DateTime.Now.ToLongTimeString()} Show name: {show.Name}");
-            }
-
-            Console.WriteLine($"IAsyncEnumerable with Yield");
+            Console.WriteLine($" ----------    IAsyncEnumerable with Yield");
             await foreach (var show in _movieCollectionService.GetTVShowsIAsyncEnumerable())
             {
                 Console.WriteLine($"{DateTime.Now.ToLongTimeString()} Show name: {show.Name}");

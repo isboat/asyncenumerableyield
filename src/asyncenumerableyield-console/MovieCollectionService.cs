@@ -16,12 +16,10 @@ namespace asyncenumerableyield_console
 
         public async IAsyncEnumerable<SearchTv> GetTVShowsIAsyncEnumerable()
         {
-            var selectedLang = "en";
-
             var page = 1;
             do
             {
-                var shows = await _client.GetTvShowListAsync(TvShowListType.Popular, selectedLang, page);
+                var shows = await _client.GetTvShowListAsync(TvShowListType.Popular, "en", page);
                 await Task.Delay(1000);
 
                 var searchResults = shows.Results.Take(1);
@@ -37,35 +35,51 @@ namespace asyncenumerableyield_console
 
         public async Task<IEnumerable<SearchTv>> GetTVShowsIEnumerable()
         {
-            var selectedLang = "en";
             var searchResults = new List<SearchTv>();
 
             var page = 1;
             do
             {
-                var shows = await _client.GetTvShowListAsync(TvShowListType.Popular, selectedLang, page);
+                var shows = await _client.GetTvShowListAsync(TvShowListType.Popular, "en", page);
+                
+                // Simulate a 1 sec
                 await Task.Delay(1000);
+                
                 searchResults.AddRange(shows.Results.Take(1));
                 page++;
 
 
-            } while (searchResults.Count < 10);
+            } while (page <= 10);
 
             return searchResults;
         }
 
         public IEnumerable<SearchTv> GetTVShows()
         {
-            for (int i = 0; i < 10; i++)
+
+            var page = 1;
+
+            do
             {
+                var shows = _client.GetTvShowListAsync(TvShowListType.Popular, "en", page).Result;
+                IEnumerable<SearchTv> searchResults = shows.Results.Take(1);
+
                 Thread.Sleep(1000);
-                yield return new SearchTv() {  Name = "Movie Name : " + i};
-            }
+
+                foreach (var show in searchResults)
+                {
+                    yield return show;
+                }
+
+                page++;
+
+
+            } while (page <= 10);
         }
 
         private static string GetApiKey()
         {
-            return "e4a9881a9a3e0972af357b42c39afb04";
+            return "7c254b68062cdaff22c742219ae8f647";
 
         }
     }
